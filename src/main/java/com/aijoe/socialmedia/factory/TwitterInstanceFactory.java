@@ -25,7 +25,8 @@ public class TwitterInstanceFactory  {
                 .setOAuthConsumerKey(twitterProperties.getConsumerKey())
                 .setOAuthConsumerSecret(twitterProperties.getConsumerSecret())
                 .setOAuthAccessToken(twitterProperties.getAccessToken())
-                .setOAuthAccessTokenSecret(twitterProperties.getAccessTokenSecret());
+                .setOAuthAccessTokenSecret(twitterProperties.getAccessTokenSecret())
+                .setTweetModeExtended(true);
 
         return cb;
     }
