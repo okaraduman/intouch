@@ -13,6 +13,10 @@ import twitter4j.Twitter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import static com.aijoe.socialmedia.util.PurifyingUtils.*;
 
 @Service
 public class TwitterServiceImpl implements TwitterService {
@@ -25,7 +29,7 @@ public class TwitterServiceImpl implements TwitterService {
     @Override
     public List<TweetInfo> searchByCompanyName(String companyName) {
         Twitter twitterInstance = twitterFactory.getInstance();
-        QueryResult result = getQueryResult(twitterInstance, clearText(companyName));
+        QueryResult result = getQueryResult(twitterInstance, removeWhiteSpaces(companyName));
         return getTweetList(result);
     }
 
@@ -34,7 +38,7 @@ public class TwitterServiceImpl implements TwitterService {
         queryResult.getTweets().stream().filter(Objects::nonNull).forEach(t->{
             TweetInfo tweetInfo = new TweetInfo();
             tweetInfo.setUser(t.getUser().getName());
-            tweetInfo.setMessage(t.getText());
+            tweetInfo.setMessage(clearSentence(t.getText()));
 
             twitterList.add(tweetInfo);
         });
@@ -50,9 +54,5 @@ public class TwitterServiceImpl implements TwitterService {
             System.out.println("An error occured while searching...");
         }
         return queryResult;
-    }
-
-    private String clearText(String text){
-        return text.replaceAll(" ", "");
     }
 }
