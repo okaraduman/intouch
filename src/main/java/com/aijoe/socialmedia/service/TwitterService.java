@@ -3,7 +3,8 @@ package com.aijoe.socialmedia.service;
 import com.aijoe.socialmedia.dto.TweetInfo;
 
 import java.util.List;
+import java.util.Set;
 
 public interface TwitterService {
-    List<TweetInfo> searchByCompanyName(String companyName);
+    Set<TweetInfo> searchByCompanyName(String companyName);
 }

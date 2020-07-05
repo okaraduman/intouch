@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+import java.util.Set;
 
 @RestController
 @RequestMapping("/social-media")
@@ -18,7 +19,7 @@ public class SocialMediaController {
     TwitterService twitterService;
 
     @GetMapping("/twitter/{companyName}")
-    public List<TweetInfo> getTweetListByCompanyName(@PathVariable("companyName") String companyName){
+    public Set<TweetInfo> getTweetListByCompanyName(@PathVariable("companyName") String companyName){
         return twitterService.searchByCompanyName(companyName);
     }
 }

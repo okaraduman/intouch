@@ -10,13 +10,10 @@ import twitter4j.Query;
 import twitter4j.QueryResult;
 import twitter4j.Twitter;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.util.*;
 
-import static com.aijoe.socialmedia.util.PurifyingUtils.*;
+import static com.aijoe.socialmedia.util.PurifyingUtils.clearSentence;
+import static com.aijoe.socialmedia.util.PurifyingUtils.removeWhiteSpaces;
 
 @Service
 public class TwitterServiceImpl implements TwitterService {
@@ -27,32 +24,57 @@ public class TwitterServiceImpl implements TwitterService {
     TwitterProperties twitterProperties;
 
     @Override
-    public List<TweetInfo> searchByCompanyName(String companyName) {
+    public Set<TweetInfo> searchByCompanyName(String companyName) {
         Twitter twitterInstance = twitterFactory.getInstance();
-        QueryResult result = getQueryResult(twitterInstance, removeWhiteSpaces(companyName));
-        return getTweetList(result);
+        List<QueryResult> queryResultList = getQueryResults(twitterInstance, companyName);
+        return getTweetList(queryResultList);
     }
 
-    public List<TweetInfo> getTweetList(QueryResult queryResult){
-        List<TweetInfo> twitterList = new ArrayList<>();
-        queryResult.getTweets().stream().filter(Objects::nonNull).forEach(t->{
-            TweetInfo tweetInfo = new TweetInfo();
-            tweetInfo.setUser(t.getUser().getName());
-            tweetInfo.setMessage(clearSentence(t.getText()));
+    private List<QueryResult> getQueryResults(Twitter twitterInstance, String companyName) {
+        List<QueryResult> queryResultList = new ArrayList<>();
+        QueryResult resultWithHashTag = getQueryResultWithHashTag(twitterInstance, removeWhiteSpaces(companyName));
+        QueryResult resultWithAtSignTag = getQueryResultWithAtSignTagTag(twitterInstance, removeWhiteSpaces(companyName));
 
-            twitterList.add(tweetInfo);
-        });
-        return twitterList;
+        queryResultList.add(resultWithHashTag);
+        queryResultList.add(resultWithAtSignTag);
+
+        return queryResultList;
     }
 
-    private QueryResult getQueryResult(Twitter twitterInstance, String searchText){
-        Query query = new Query("#" + searchText).lang(twitterProperties.getLanguage()).count(twitterProperties.getMaxResultCount());
+    private QueryResult getQueryResultWithHashTag(Twitter twitterInstance, String searchText) {
+        Query queryWithHashTag = new Query("#" + searchText).lang(twitterProperties.getLanguage()).count(twitterProperties.getMaxResultCount());
         QueryResult queryResult = null;
-        try{
-            queryResult = twitterInstance.search(query);
-        }catch (Exception e){
+        try {
+            queryResult = twitterInstance.search(queryWithHashTag);
+        } catch (Exception e) {
             System.out.println("An error occured while searching...");
         }
         return queryResult;
+    }
+
+    private QueryResult getQueryResultWithAtSignTagTag(Twitter twitterInstance, String searchText) {
+        Query queryWithAtSignTag = new Query("@" + searchText).lang(twitterProperties.getLanguage()).count(twitterProperties.getMaxResultCount());
+        QueryResult queryResult = null;
+        try {
+            queryResult = twitterInstance.search(queryWithAtSignTag);
+        } catch (Exception e) {
+            System.out.println("An error occured while searching...");
+        }
+        return queryResult;
+    }
+
+    private Set<TweetInfo> getTweetList(List<QueryResult> queryResultList) {
+        Set<TweetInfo> twitterList = new HashSet<>();
+        queryResultList.stream().filter(Objects::nonNull).forEach(queryResult -> {
+            queryResult.getTweets().stream().filter(Objects::nonNull).forEach(t -> {
+                TweetInfo tweetInfo = new TweetInfo();
+                String messageText = t.isRetweet() ? t.getRetweetedStatus().getText() : t.getText();
+                tweetInfo.setMessage(clearSentence(messageText));
+
+                twitterList.add(tweetInfo);
+            });
+        });
+
+        return twitterList;
     }
 }
