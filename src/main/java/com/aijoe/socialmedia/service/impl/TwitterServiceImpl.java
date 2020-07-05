@@ -33,7 +33,7 @@ public class TwitterServiceImpl implements TwitterService {
     private List<QueryResult> getQueryResults(Twitter twitterInstance, String companyName) {
         List<QueryResult> queryResultList = new ArrayList<>();
         QueryResult resultWithHashTag = getQueryResultWithHashTag(twitterInstance, removeWhiteSpaces(companyName));
-        QueryResult resultWithAtSignTag = getQueryResultWithAtSignTagTag(twitterInstance, removeWhiteSpaces(companyName));
+        QueryResult resultWithAtSignTag = getQueryResultWithAtSignTag(twitterInstance, removeWhiteSpaces(companyName));
 
         queryResultList.add(resultWithHashTag);
         queryResultList.add(resultWithAtSignTag);
@@ -52,7 +52,7 @@ public class TwitterServiceImpl implements TwitterService {
         return queryResult;
     }
 
-    private QueryResult getQueryResultWithAtSignTagTag(Twitter twitterInstance, String searchText) {
+    private QueryResult getQueryResultWithAtSignTag(Twitter twitterInstance, String searchText) {
         Query queryWithAtSignTag = new Query("@" + searchText).lang(twitterProperties.getLanguage()).count(twitterProperties.getMaxResultCount());
         QueryResult queryResult = null;
         try {
