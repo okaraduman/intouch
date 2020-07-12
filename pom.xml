@@ -48,6 +48,24 @@
 		</dependency>
 
 		<dependency>
+			<groupId>zemberek-nlp</groupId>
+			<artifactId>zemberek-tokenization</artifactId>
+			<version>0.17.1</version>
+		</dependency>
+
+		<dependency>
+			<groupId>nz.ac.waikato.cms.weka</groupId>
+			<artifactId>weka-stable</artifactId>
+			<version>3.6.6</version>
+		</dependency>
+
+		<dependency>
+			<groupId>zemberek-nlp</groupId>
+			<artifactId>core</artifactId>
+			<version>0.9.0</version>
+		</dependency>
+
+		<dependency>
 			<groupId>org.jsoup</groupId>
 			<artifactId>jsoup</artifactId>
 			<version>1.13.1</version>
