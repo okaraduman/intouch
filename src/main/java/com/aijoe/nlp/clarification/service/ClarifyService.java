@@ -5,3 +5,4 @@ import java.util.List;
 public interface ClarifyService {
     List<String> clarifySentence(List<String> sentences);
 }
+

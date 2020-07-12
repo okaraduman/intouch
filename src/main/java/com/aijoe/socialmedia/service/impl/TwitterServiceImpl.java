@@ -25,6 +25,7 @@ public class TwitterServiceImpl implements TwitterService {
 
     @Override
     public Set<TweetInfo> searchByCompanyName(String companyName) {
+        companyName = getCompanyName(companyName);
         Twitter twitterInstance = twitterFactory.getInstance();
         List<QueryResult> queryResultList = getQueryResults(twitterInstance, companyName);
         return getTweetList(queryResultList);
@@ -76,5 +77,9 @@ public class TwitterServiceImpl implements TwitterService {
         });
 
         return twitterList;
+    }
+
+    private String getCompanyName(String companyName){
+        return companyName.replaceAll(" ", "").toLowerCase(new Locale("tr"));
     }
 }
