@@ -29,29 +29,15 @@ public class InTouchController {
     SikayetVarService sikayetVarService;
 
     @GetMapping("/test/{companyName}")
-    public List<TweetInfo> testService(@PathVariable("companyName") String companyName){
+    public List<TweetInfo> testService(@PathVariable("companyName") String companyName) {
         List<String> reviewList = sikayetVarService.getReviews(companyName);
         Set<TweetInfo> tweetList = twitterService.searchByCompanyName(companyName);
-        List<String> messages = tweetList.stream().map(t->t.getMessage()).collect(Collectors.toList());
+        List<String> messages = tweetList.stream().map(t -> t.getMessage()).collect(Collectors.toList());
         List<String> clearList = clarifyService.clarifySentence(messages);
-        clearList.stream().filter(Objects::nonNull).forEach(t->{
+        clearList.stream().filter(Objects::nonNull).forEach(t -> {
 
         });
-
-    @GetMapping("/test/{companyName}")
-    public List<TweetInfo> testService(@PathVariable("companyName") String companyName){
-        Set<TweetInfo> tweetList = twitterService.searchByCompanyName(companyName);
-        List<String> messages = tweetList.stream().map(t->t.getMessage()).collect(Collectors.toList());
-        List<String> clearList = clarifyService.clarifySentence(messages);
-        List<TweetInfo> newList = new ArrayList<>();
-        messages.forEach(t-> {
-            TweetInfo tweetInfo = new TweetInfo();
-            tweetInfo.setMessage(t);
-
-            newList.add(tweetInfo);
-        });
-
-        return newList;
+        return null;
     }
 
 }
