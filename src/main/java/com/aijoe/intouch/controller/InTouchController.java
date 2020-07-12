@@ -27,7 +27,7 @@ public class InTouchController {
     public List<TweetInfo> testService(@PathVariable("companyName") String companyName){
         Set<TweetInfo> tweetList = twitterService.searchByCompanyName(companyName);
         List<String> messages = tweetList.stream().map(t->t.getMessage()).collect(Collectors.toList());
-        List<String> clearList = clarifyService.fixSpellMistake(messages);
+        List<String> clearList = clarifyService.clarifySentence(messages);
         List<TweetInfo> newList = new ArrayList<>();
         messages.forEach(t-> {
             TweetInfo tweetInfo = new TweetInfo();

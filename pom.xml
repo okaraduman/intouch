@@ -34,7 +34,7 @@
 			<artifactId>twitter4j-core</artifactId>
 			<version>4.0.7</version>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>zemberek-nlp</groupId>
 			<artifactId>zemberek-morphology</artifactId>

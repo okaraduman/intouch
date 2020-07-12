@@ -1,14 +1,7 @@
 package com.aijoe.nlp.clarification.service.impl;
 
-import Corpus.Sentence;
-import MorphologicalAnalysis.FsmMorphologicalAnalyzer;
-import Ngram.NGram;
-import Ngram.NoSmoothing;
-import SpellChecker.NGramSpellChecker;
-import SpellChecker.SimpleSpellChecker;
 import com.aijoe.nlp.clarification.service.ClarifyService;
 import org.springframework.stereotype.Service;
-import org.springframework.util.CollectionUtils;
 import zemberek.morphology.TurkishMorphology;
 import zemberek.normalization.TurkishSpellChecker;
 import zemberek.tokenization.Token;
@@ -16,41 +9,33 @@ import zemberek.tokenization.TurkishTokenizer;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class ClarifyServiceImpl implements ClarifyService {
 
-    @Override
-    public List<String> fixSpellMistake(List<String> sentences) {
+    private TurkishMorphology morphology;
+    private TurkishSpellChecker spellChecker;
+    private TurkishTokenizer tokenizer;
 
-        TurkishMorphology morphology = TurkishMorphology.createWithDefaults();
-        List<String> newSentences = new ArrayList<>();
-        try {
-            TurkishSpellChecker spellChecker = new TurkishSpellChecker(morphology);
-            StringBuilder sb = new StringBuilder();
-            sentences.stream().forEach(sentence ->{
-                newSentences.add(sentence);
-                newSentences.add(doSth(sentence));
-            });
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return newSentences;
-    }
-
-    public String doSth(String sentence){
-        TurkishTokenizer tokenizer = TurkishTokenizer.ALL;
-        TurkishMorphology morphology = TurkishMorphology.createWithDefaults();
-        TurkishSpellChecker spellChecker = null;
+    public ClarifyServiceImpl(){
+        morphology = TurkishMorphology.createWithDefaults();
+        tokenizer = TurkishTokenizer.ALL;
         try {
             spellChecker = new TurkishSpellChecker(morphology);
         } catch (IOException e) {
-            e.printStackTrace();
+            System.out.println("An error occured while creating spell checker...");
         }
-        StringBuilder output = new StringBuilder();
+    }
 
+    @Override
+    public List<String> clarifySentence(List<String> sentences) {
+        return sentences.stream().map(this::fixSpellMistakes).collect(Collectors.toList());
+    }
+
+    private String fixSpellMistakes(String sentence) {
+        StringBuilder output = new StringBuilder();
         for (Token token : tokenizer.tokenize(sentence)) {
             String text = token.getText();
             if (analyzeToken(token) && !spellChecker.check(text)) {
@@ -67,7 +52,8 @@ public class ClarifyServiceImpl implements ClarifyService {
         }
         return output.toString();
     }
-    static boolean analyzeToken(Token token) {
+
+    private boolean analyzeToken(Token token) {
         return token.getType() != Token.Type.NewLine
                 && token.getType() != Token.Type.SpaceTab
                 && token.getType() != Token.Type.UnknownWord
