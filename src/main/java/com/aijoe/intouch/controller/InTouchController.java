@@ -1,6 +1,7 @@
 package com.aijoe.intouch.controller;
 
 import com.aijoe.nlp.clarification.service.ClarifyService;
+import com.aijoe.nlp.summary.service.SummaryService;
 import com.aijoe.socialmedia.dto.TweetInfo;
 import com.aijoe.socialmedia.service.SikayetVarService;
 import com.aijoe.socialmedia.service.TwitterService;
@@ -28,9 +29,13 @@ public class InTouchController {
     @Autowired
     SikayetVarService sikayetVarService;
 
+    @Autowired
+    SummaryService summaryService;
+
     @GetMapping("/test/{companyName}")
     public List<TweetInfo> testService(@PathVariable("companyName") String companyName) {
         List<String> reviewList = sikayetVarService.getReviews(companyName);
+        summaryService.getSummary(reviewList);
         Set<TweetInfo> tweetList = twitterService.searchByCompanyName(companyName);
         List<String> messages = tweetList.stream().map(t -> t.getMessage()).collect(Collectors.toList());
         List<String> clearList = clarifyService.clarifySentence(messages);
