@@ -3,11 +3,14 @@ package com.aijoe.nlp.clarification.service.implementation;
 import com.aijoe.nlp.clarification.service.ClarifyService;
 import org.springframework.stereotype.Service;
 import zemberek.morphology.TurkishMorphology;
+import zemberek.normalization.TurkishSentenceNormalizer;
 import zemberek.normalization.TurkishSpellChecker;
 import zemberek.tokenization.Token;
 import zemberek.tokenization.TurkishTokenizer;
 
 import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -20,12 +23,17 @@ public class ClarifyServiceImpl implements ClarifyService {
     private TurkishMorphology morphology;
     private TurkishSpellChecker spellChecker;
     private TurkishTokenizer tokenizer;
+    private TurkishSentenceNormalizer normalizer;
 
     public ClarifyServiceImpl() {
         morphology = TurkishMorphology.createWithDefaults();
         tokenizer = TurkishTokenizer.ALL;
         try {
             spellChecker = new TurkishSpellChecker(morphology);
+            Path lookupRoot = Paths.get("data/normalization");
+            Path lmFile = Paths.get("data/lm/lm.2gram.slm");
+            normalizer = new TurkishSentenceNormalizer(morphology, lookupRoot, lmFile);
+
         } catch (IOException e) {
             LOGGER.info("An error occured while creating spell checker...");
         }
@@ -33,7 +41,7 @@ public class ClarifyServiceImpl implements ClarifyService {
 
     @Override
     public List<String> clarifySentence(List<String> sentences) {
-        return sentences.stream().map(this::fixSpellMistakes).collect(Collectors.toList());
+        return sentences.stream().map(this::normalizeSentence).collect(Collectors.toList());
     }
 
     private String fixSpellMistakes(String sentence) {
@@ -53,6 +61,10 @@ public class ClarifyServiceImpl implements ClarifyService {
             }
         }
         return output.toString();
+    }
+
+    private String normalizeSentence(String sentence){
+        return normalizer.normalize(sentence);
     }
 
     private boolean analyzeToken(Token token) {

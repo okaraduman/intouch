@@ -31,10 +31,13 @@ public class SikayetVarServiceImpl implements SikayetVarService {
         List<String> reviewList = new ArrayList<>();
 
         for (int pageNo = 1; pageNo <= sikayetVarProperties.getMaxPageCount(); pageNo++) {
+            Document document;
             if (pageNo != 1) {
-                url = stringBuilder.append("?").append("page=").append(pageNo).toString();
+                StringBuilder newBuilder = new StringBuilder();
+                document = callUrl(newBuilder.append(url).append("?").append("page=").append(pageNo).toString());
+            } else {
+                document = callUrl(url);
             }
-            Document document = callUrl(url);
             Elements elementsOfPage = getAllElementsOfPage(document);
             reviewList.addAll(getElementsText(elementsOfPage));
         }
