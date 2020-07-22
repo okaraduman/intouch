@@ -37,7 +37,7 @@ public class InTouchController {
         List<String> reviewList = sikayetVarService.getReviews(companyName);
         summaryService.getSummary(reviewList);
         Set<TweetInfo> tweetList = twitterService.searchByCompanyName(companyName);
-        List<String> messages = tweetList.stream().map(t -> t.getMessage()).collect(Collectors.toList());
+        List<String> messages = tweetList.stream().map(TweetInfo::getMessage).collect(Collectors.toList());
         List<String> clearList = clarifyService.clarifySentence(messages);
         clearList.stream().filter(Objects::nonNull).forEach(t -> {
 

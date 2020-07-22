@@ -157,7 +157,7 @@ public class NewPreprocess {
     }
 
     public String createChains(List<NewLexical> lexicals) throws IOException {
-        List<NewChain> chains = lexicalChain.chainBuilder(lexicals);
+        List<NewChain> chains = lexicalChain.chainBuilder(lexicals); //Burası cok uzun sürüyor
         LOGGER.info("#############All Chains: " + chains.size());
         List<NewChain> uniqueChains = lexicalChain.chainAnalyse(chains);
         LOGGER.info("#############Unique Chains: " + uniqueChains.size());

@@ -22,16 +22,16 @@ public class SummaryServiceImpl implements SummaryService {
     @Override
     public List<String> getSummary(List<String> messageList) {
         List<String> summaryList = new ArrayList<>();
-        StringBuilder stringBuilder = new StringBuilder();
+
         try {
             NewPreprocess preprocess = new NewPreprocess(turkishParser);
 
             for (String message : messageList) {
+                StringBuilder stringBuilder = new StringBuilder();
                 String cleanText = preprocess.cleanStopWords(message);
                 List<NewLexical> lexicals = preprocess.getAllLexicals(cleanText, message);
                 stringBuilder.append(preprocess.createChains(lexicals));
                 summaryList.add(stringBuilder.toString());
-                stringBuilder.setLength(0);
             }
         } catch (IOException e) {
             e.printStackTrace();
