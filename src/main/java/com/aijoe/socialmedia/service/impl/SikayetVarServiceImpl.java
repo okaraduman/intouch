@@ -1,6 +1,7 @@
 package com.aijoe.socialmedia.service.impl;
 
 import com.aijoe.socialmedia.config.SikayetVarProperties;
+import com.aijoe.socialmedia.model.dto.SikayetVarInfo;
 import com.aijoe.socialmedia.service.SikayetVarService;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -24,38 +25,51 @@ public class SikayetVarServiceImpl implements SikayetVarService {
     SikayetVarProperties sikayetVarProperties;
 
     @Override
-    public List<String> getReviews(String companyName) {
+    public List<SikayetVarInfo> getReviews(String companyName) {
         companyName = getCompanyName(companyName);
         StringBuilder stringBuilder = new StringBuilder();
         String url = stringBuilder.append(sikayetVarProperties.getUrl()).append(companyName).toString();
-        List<String> reviewList = new ArrayList<>();
+        List<SikayetVarInfo> reviewList = new ArrayList<>();
 
         for (int pageNo = 1; pageNo <= sikayetVarProperties.getMaxPageCount(); pageNo++) {
-            Document document;
-            if (pageNo != 1) {
-                StringBuilder newBuilder = new StringBuilder();
-                document = callUrl(newBuilder.append(url).append("?").append("page=").append(pageNo).toString());
-            } else {
-                document = callUrl(url);
+            try {
+                Document document;
+                if (pageNo != 1) {
+                    StringBuilder newBuilder = new StringBuilder();
+                    document = callUrl(newBuilder.append(url).append("?").append("page=").append(pageNo).toString());
+                } else {
+                    document = callUrl(url);
+                }
+                Elements elementsOfPage = getAllElementsOfPage(document);
+                reviewList.addAll(getElementsText(elementsOfPage));
+            } catch (Exception e) {
+                System.out.println("Cannot reach the web site at the moment... " + url + "?page=" + pageNo);
             }
-            Elements elementsOfPage = getAllElementsOfPage(document);
-            reviewList.addAll(getElementsText(elementsOfPage));
         }
 
         return reviewList;
     }
 
-    private List<String> getElementsText(Elements elements) {
-        List<String> textList = new ArrayList<>();
+    private List<SikayetVarInfo> getElementsText(Elements elements) {
+        List<SikayetVarInfo> sikayetVarInfoList = new ArrayList<>();
         for (Element element : elements) {
             if (!isReadMoreEmpty(element)) {
-                String fullTextUrl = getFullTextUrl(element);
-                Document document = callUrl(fullTextUrl);
-                String text = getCleanText(document);
-                textList.add(text);
+                try {
+                    String fullTextUrl = getFullTextUrl(element);
+                    Document document = callUrl(fullTextUrl);
+                    String text = getCleanText(document);
+
+                    SikayetVarInfo sikayetVarInfo = new SikayetVarInfo();
+                    sikayetVarInfo.setMessage(text);
+                    sikayetVarInfo.setUrl(fullTextUrl);
+
+                    sikayetVarInfoList.add(sikayetVarInfo);
+                } catch (Exception e) {
+                    System.out.println("Cannot reach for the element... " + element);
+                }
             }
         }
-        return textList;
+        return sikayetVarInfoList;
     }
 
     private Document callUrl(String url) {
