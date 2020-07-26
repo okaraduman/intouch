@@ -1,5 +1,6 @@
 package com.aijoe.intouch.service.implementation;
 
+import com.aijoe.intouch.config.IntouchProperties;
 import com.aijoe.intouch.model.dto.TicketInfo;
 import com.aijoe.intouch.model.output.FeedbackOutput;
 import com.aijoe.intouch.service.IntouchService;
@@ -11,6 +12,7 @@ import com.aijoe.socialmedia.service.SikayetVarService;
 import com.aijoe.socialmedia.service.TwitterService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 import zemberek.classification.FastTextClassifier;
 import zemberek.core.ScoredItem;
 import zemberek.core.turkish.Turkish;
@@ -20,7 +22,9 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
+import java.util.stream.Collectors;
 
+import static com.aijoe.intouch.model.enumaration.CategoryNameEnum.NO_MATCH;
 import static com.aijoe.intouch.model.enumaration.CategoryNameIntentMapping.CATEGORY_NAME_INTENT_MAP;
 
 @Service
@@ -36,6 +40,9 @@ public class IntouchServiceImpl implements IntouchService {
 
     @Autowired
     SummaryService summaryService;
+
+    @Autowired
+    IntouchProperties intouchProperties;
 
     @Override
     public FeedbackOutput getTwitterFeedbacks(String companyName) {
@@ -65,7 +72,8 @@ public class IntouchServiceImpl implements IntouchService {
             ticketInfo.setOriginalMessage(review.getMessage());
             ticketInfo.setOriginalMessageUrl(review.getUrl());
             ticketInfo.setSummaryText(summaryService.getSummary(review.getMessage()));
-            ticketInfo.setIntents(Arrays.asList("Ayca", "Limoncello", "Topal"));
+            List<String> intentsWithLabel = classify(review.getMessage());
+            ticketInfo.setIntents(getCategoryList(intentsWithLabel));
             ticketInfo.setOutputMessage("This is a test for sikayetvar...");
 
             placeTicketsIntoCategory(ticketInfo, feedbackOutput);
@@ -74,25 +82,31 @@ public class IntouchServiceImpl implements IntouchService {
         return feedbackOutput;
     }
 
-    private void classifyMessage(String message) {
+    private List<String> classify(String message) {
         try {
-            Path path = Paths.get("src/main/resources/corpus/new2.model");
+            Path path = Paths.get("src/main/resources/datasets/corpus.model");
             FastTextClassifier classifier = FastTextClassifier.load(path);
-
-            String s = "İnternetim gitti ttnet.";
-
-            String processed = String.join(" ", TurkishTokenizer.DEFAULT.tokenizeToStrings(s));
+            String processed = String.join(" ", TurkishTokenizer.DEFAULT.tokenizeToStrings(message));
             processed = processed.toLowerCase(Turkish.LOCALE);
 
-            // results, only top three.
-            List<ScoredItem<String>> res = classifier.predict(processed, 3);
+            List<ScoredItem<String>> classifierResults = classifier.predict(processed, 3);
 
-            for (ScoredItem<String> re : res) {
-                System.out.println(re);
+            if (!CollectionUtils.isEmpty(classifierResults)) {
+                return classifierResults.stream().filter(Objects::nonNull).filter(t -> t.score > intouchProperties.getTreshold()).map(t -> t.item).collect(Collectors.toList());
             }
+            return new ArrayList<String>() {{
+                add(NO_MATCH);
+            }};
         } catch (IOException e) {
             e.printStackTrace();
+            return new ArrayList<String>() {{
+                add(NO_MATCH);
+            }};
         }
+    }
+
+    private List<String> getCategoryList(List<String> intents) {
+        return intents.stream().filter(Objects::nonNull).map(this::getCategoryNameByIntent).collect(Collectors.toList());
     }
 
     private void placeTicketsIntoCategory(TicketInfo ticketInfo, FeedbackOutput feedbackOutput) {

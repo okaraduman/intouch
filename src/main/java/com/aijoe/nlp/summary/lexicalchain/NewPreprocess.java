@@ -59,7 +59,7 @@ public class NewPreprocess {
 
     // burda stopwords listesindeki tüm kelimeler çıkartılacak text içinden
     public String cleanStopWords(String textFile) throws IOException {
-        String stopWordsFilename = "/datasets/stopwordsTurkish.txt";
+        String stopWordsFilename = "./datasets/stopwordsTurkish.txt";
         String getStopWords = getFile(stopWordsFilename);
         String stopWordsText = readTextFile(getStopWords);
         stopWordsText = stopWordsText.toLowerCase();
