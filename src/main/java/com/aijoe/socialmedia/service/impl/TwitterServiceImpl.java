@@ -1,8 +1,8 @@
 package com.aijoe.socialmedia.service.impl;
 
 import com.aijoe.socialmedia.config.TwitterProperties;
-import com.aijoe.socialmedia.dto.TweetInfo;
 import com.aijoe.socialmedia.factory.TwitterInstanceFactory;
+import com.aijoe.socialmedia.model.dto.TweetInfo;
 import com.aijoe.socialmedia.service.TwitterService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -71,7 +71,7 @@ public class TwitterServiceImpl implements TwitterService {
                 TweetInfo tweetInfo = new TweetInfo();
                 String messageText = t.isRetweet() ? t.getRetweetedStatus().getText() : t.getText();
                 tweetInfo.setMessage(clearSentence(messageText));
-
+                tweetInfo.setUrl("https://twitter.com/i/web/status/" + t.getId());
                 twitterList.add(tweetInfo);
             });
         });

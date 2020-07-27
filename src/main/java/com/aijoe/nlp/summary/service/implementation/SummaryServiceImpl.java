@@ -20,7 +20,24 @@ public class SummaryServiceImpl implements SummaryService {
     TurkishParser turkishParser;
 
     @Override
-    public List<String> getSummary(List<String> messageList) {
+    public String getSummary(String message) {
+        try {
+            NewPreprocess preprocess = new NewPreprocess(turkishParser);
+
+            StringBuilder stringBuilder = new StringBuilder();
+            String cleanText = preprocess.cleanStopWords(message);
+            List<NewLexical> lexicals = preprocess.getAllLexicals(cleanText, message);
+            stringBuilder.append(preprocess.createChains(lexicals));
+
+            return stringBuilder.toString();
+        } catch (IOException e) {
+            e.printStackTrace();
+            return message;
+        }
+    }
+
+    @Override
+    public List<String> getSummaryList(List<String> messageList) {
         List<String> summaryList = new ArrayList<>();
 
         try {
