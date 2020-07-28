@@ -59,7 +59,7 @@ public class IntouchServiceImpl implements IntouchService {
 
             placeTicketsIntoCategory(ticketInfo, feedbackOutput);
         });
-
+        feedbackOutput.setTotalMessageCount(tweetList.size());
         return feedbackOutput;
     }
 
@@ -78,7 +78,7 @@ public class IntouchServiceImpl implements IntouchService {
 
             placeTicketsIntoCategory(ticketInfo, feedbackOutput);
         });
-
+        feedbackOutput.setTotalMessageCount(reviewList.size());
         return feedbackOutput;
     }
 
@@ -105,21 +105,53 @@ public class IntouchServiceImpl implements IntouchService {
         }
     }
 
+    private List<String> classifyEachSentence(String messages) {
+        try {
+            Path path = Paths.get("src/main/resources/datasets/corpus.model");
+            FastTextClassifier classifier = FastTextClassifier.load(path);
+            String[] splittedMessage = messages.split("[.!?:]");
+            Set<String> intentList = new HashSet<>();
+
+            Arrays.asList(splittedMessage).stream().forEach(message -> {
+                String processed = String.join(" ", TurkishTokenizer.DEFAULT.tokenizeToStrings(message));
+                processed = processed.toLowerCase(Turkish.LOCALE);
+                List<ScoredItem<String>> classifierResults = classifier.predict(processed, 3);
+                if (!CollectionUtils.isEmpty(classifierResults)) {
+                    intentList.addAll(classifierResults.stream().filter(Objects::nonNull).filter(t -> t.score > intouchProperties.getTreshold()).map(t -> t.item).collect(Collectors.toSet()));
+                }
+            });
+
+            return intentList.stream().collect(Collectors.toList());
+
+        } catch (IOException e) {
+            e.printStackTrace();
+            return new ArrayList<String>() {{
+                add(NO_MATCH);
+            }};
+        }
+    }
+
     private List<String> getCategoryList(List<String> intents) {
         return intents.stream().filter(Objects::nonNull).map(this::getCategoryNameByIntent).collect(Collectors.toList());
     }
 
     private void placeTicketsIntoCategory(TicketInfo ticketInfo, FeedbackOutput feedbackOutput) {
-        ticketInfo.getIntents().stream().forEach(intent -> {
-            String categoryName = getCategoryNameByIntent(intent);
-            if (feedbackOutput.getCategoryList().containsKey(categoryName)) {
-                feedbackOutput.getCategoryList().get(categoryName).add(ticketInfo);
-            } else {
-                feedbackOutput.getCategoryList().put(categoryName, new ArrayList<TicketInfo>() {{
-                    add(ticketInfo);
-                }});
-            }
-        });
+        if (!CollectionUtils.isEmpty(ticketInfo.getIntents())) {
+            ticketInfo.getIntents().stream().forEach(intent -> {
+                String categoryName = getCategoryNameByIntent(intent);
+                if (feedbackOutput.getCategoryList().containsKey(categoryName)) {
+                    feedbackOutput.getCategoryList().get(categoryName).add(ticketInfo);
+                } else {
+                    feedbackOutput.getCategoryList().put(categoryName, new ArrayList<TicketInfo>() {{
+                        add(ticketInfo);
+                    }});
+                }
+            });
+        } else {
+            feedbackOutput.getCategoryList().put("NO_MATCH", new ArrayList<TicketInfo>() {{
+                add(ticketInfo);
+            }});
+        }
     }
 
     private String getCategoryNameByIntent(String intent) {
