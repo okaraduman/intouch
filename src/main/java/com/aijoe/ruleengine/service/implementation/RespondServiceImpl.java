@@ -4,6 +4,7 @@ import com.aijoe.ruleengine.service.RespondService;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Locale;
 
 import static com.aijoe.ruleengine.model.constant.IntentResponseConstants.RESPOND_FOOTER;
 import static com.aijoe.ruleengine.model.constant.IntentResponseConstants.RESPOND_HEADER;
@@ -13,7 +14,7 @@ import static com.aijoe.ruleengine.model.map.IntentCombinationRespondMap.RESPOND
 public class RespondServiceImpl implements RespondService {
 
     @Override
-    public String produceRespond(List<String> intentList) {
+    public String produceRespond(List<String> intentList, String companyName) {
         StringBuilder respondBuilder = new StringBuilder();
         String combinationKey = String.join("-", intentList);
 
@@ -28,7 +29,7 @@ public class RespondServiceImpl implements RespondService {
             });
         }
 
-        respondBuilder.append(RESPOND_FOOTER);
+        respondBuilder.append(RESPOND_FOOTER).append(companyName.toUpperCase(new Locale("tr")));
         return respondBuilder.toString();
     }
 }

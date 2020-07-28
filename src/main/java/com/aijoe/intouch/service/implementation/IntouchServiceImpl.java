@@ -6,6 +6,7 @@ import com.aijoe.intouch.model.output.FeedbackOutput;
 import com.aijoe.intouch.service.IntouchService;
 import com.aijoe.nlp.clarification.service.ClarifyService;
 import com.aijoe.nlp.summary.service.SummaryService;
+import com.aijoe.ruleengine.service.RespondService;
 import com.aijoe.socialmedia.model.dto.SikayetVarInfo;
 import com.aijoe.socialmedia.model.dto.TweetInfo;
 import com.aijoe.socialmedia.service.SikayetVarService;
@@ -42,6 +43,9 @@ public class IntouchServiceImpl implements IntouchService {
     SummaryService summaryService;
 
     @Autowired
+    RespondService respondService;
+
+    @Autowired
     IntouchProperties intouchProperties;
 
     @Override
@@ -71,10 +75,14 @@ public class IntouchServiceImpl implements IntouchService {
             TicketInfo ticketInfo = new TicketInfo();
             ticketInfo.setOriginalMessage(review.getMessage());
             ticketInfo.setOriginalMessageUrl(review.getUrl());
-            ticketInfo.setSummaryText(summaryService.getSummary(review.getMessage()));
+            //ticketInfo.setSummaryText(summaryService.getSummary(review.getMessage()));
             List<String> intentsWithLabel = classify(review.getMessage());
             ticketInfo.setIntents(getCategoryList(intentsWithLabel));
-            ticketInfo.setOutputMessage("This is a test for sikayetvar...");
+
+            List<String> intentEachSentence = classifyEachSentence(review.getMessage());
+            ticketInfo.setIntentEachSentence(getCategoryList(intentEachSentence));
+            ticketInfo.setIsIntentCountEqual(intentsWithLabel.size() == intentEachSentence.size());
+            ticketInfo.setOutputMessage(respondService.produceRespond(intentsWithLabel, companyName));
 
             placeTicketsIntoCategory(ticketInfo, feedbackOutput);
         });
