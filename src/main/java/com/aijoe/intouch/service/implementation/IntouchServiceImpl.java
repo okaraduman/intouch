@@ -30,23 +30,22 @@ import static com.aijoe.intouch.model.enumaration.CategoryNameIntentMapping.CATE
 
 @Service
 public class IntouchServiceImpl implements IntouchService {
-    @Autowired
-    TwitterService twitterService;
+    private TwitterService twitterService;
+    private SikayetVarService sikayetVarService;
+    private ClarifyService clarifyService;
+    private SummaryService summaryService;
+    private RespondService respondService;
+    private IntouchProperties intouchProperties;
 
     @Autowired
-    ClarifyService clarifyService;
-
-    @Autowired
-    SikayetVarService sikayetVarService;
-
-    @Autowired
-    SummaryService summaryService;
-
-    @Autowired
-    RespondService respondService;
-
-    @Autowired
-    IntouchProperties intouchProperties;
+    public IntouchServiceImpl(TwitterService twitterService, SikayetVarService sikayetVarService, ClarifyService clarifyService, SummaryService summaryService, RespondService respondService, IntouchProperties intouchProperties) {
+        this.twitterService = twitterService;
+        this.clarifyService = clarifyService;
+        this.sikayetVarService = sikayetVarService;
+        this.summaryService = summaryService;
+        this.respondService = respondService;
+        this.intouchProperties = intouchProperties;
+    }
 
     @Override
     public FeedbackOutput getTwitterFeedbacks(String companyName) {
@@ -58,8 +57,9 @@ public class IntouchServiceImpl implements IntouchService {
             ticketInfo.setOriginalMessageUrl(tweet.getUrl());
             String cleanText = clarifyService.clarifySentence(Arrays.asList(tweet.getMessage())).stream().filter(Objects::nonNull).findFirst().get();
             ticketInfo.setSummaryText(cleanText);
-            ticketInfo.setIntents(Arrays.asList("Osman", "Burak", "Kazkilinc"));
-            ticketInfo.setOutputMessage("This is a test for twitter...");
+            List<String> intentsWithLabel = classify(tweet.getMessage());
+            ticketInfo.setIntents(getCategoryList(intentsWithLabel));
+            ticketInfo.setOutputMessage(respondService.produceRespond(ticketInfo.getIntents(), companyName));
 
             placeTicketsIntoCategory(ticketInfo, feedbackOutput);
         });
@@ -75,14 +75,10 @@ public class IntouchServiceImpl implements IntouchService {
             TicketInfo ticketInfo = new TicketInfo();
             ticketInfo.setOriginalMessage(review.getMessage());
             ticketInfo.setOriginalMessageUrl(review.getUrl());
-            //ticketInfo.setSummaryText(summaryService.getSummary(review.getMessage()));
+            ticketInfo.setSummaryText(summaryService.getSummary(review.getMessage()));
             List<String> intentsWithLabel = classify(review.getMessage());
             ticketInfo.setIntents(getCategoryList(intentsWithLabel));
-
-            List<String> intentEachSentence = classifyEachSentence(review.getMessage());
-            ticketInfo.setIntentEachSentence(getCategoryList(intentEachSentence));
-            ticketInfo.setIsIntentCountEqual(intentsWithLabel.size() == intentEachSentence.size());
-            ticketInfo.setOutputMessage(respondService.produceRespond(intentsWithLabel, companyName));
+            ticketInfo.setOutputMessage(respondService.produceRespond(ticketInfo.getIntents(), companyName));
 
             placeTicketsIntoCategory(ticketInfo, feedbackOutput);
         });
@@ -90,30 +86,7 @@ public class IntouchServiceImpl implements IntouchService {
         return feedbackOutput;
     }
 
-    private List<String> classify(String message) {
-        try {
-            Path path = Paths.get("src/main/resources/datasets/corpus.model");
-            FastTextClassifier classifier = FastTextClassifier.load(path);
-            String processed = String.join(" ", TurkishTokenizer.DEFAULT.tokenizeToStrings(message));
-            processed = processed.toLowerCase(Turkish.LOCALE);
-
-            List<ScoredItem<String>> classifierResults = classifier.predict(processed, 3);
-
-            if (!CollectionUtils.isEmpty(classifierResults)) {
-                return classifierResults.stream().filter(Objects::nonNull).filter(t -> t.score > intouchProperties.getTreshold()).map(t -> t.item).collect(Collectors.toList());
-            }
-            return new ArrayList<String>() {{
-                add(NO_MATCH);
-            }};
-        } catch (IOException e) {
-            e.printStackTrace();
-            return new ArrayList<String>() {{
-                add(NO_MATCH);
-            }};
-        }
-    }
-
-    private List<String> classifyEachSentence(String messages) {
+    private List<String> classify(String messages) {
         try {
             Path path = Paths.get("src/main/resources/datasets/corpus.model");
             FastTextClassifier classifier = FastTextClassifier.load(path);
@@ -156,7 +129,7 @@ public class IntouchServiceImpl implements IntouchService {
                 }
             });
         } else {
-            feedbackOutput.getCategoryList().put("NO_MATCH", new ArrayList<TicketInfo>() {{
+            feedbackOutput.getCategoryList().put(NO_MATCH, new ArrayList<TicketInfo>() {{
                 add(ticketInfo);
             }});
         }
