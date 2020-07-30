@@ -50,6 +50,7 @@ public class IntouchServiceImpl implements IntouchService {
     @Override
     public FeedbackOutput getTwitterFeedbacks(String companyName) {
         FeedbackOutput feedbackOutput = new FeedbackOutput();
+        String originalCompanyName = companyName;
         Set<TweetInfo> tweetList = twitterService.searchByCompanyName(companyName);
         tweetList.stream().forEach(tweet -> {
             TicketInfo ticketInfo = new TicketInfo();
@@ -59,7 +60,7 @@ public class IntouchServiceImpl implements IntouchService {
             ticketInfo.setSummaryText(cleanText);
             List<String> intentsWithLabel = classify(tweet.getMessage());
             ticketInfo.setIntents(getCategoryList(intentsWithLabel));
-            ticketInfo.setOutputMessage(respondService.produceRespond(ticketInfo.getIntents(), companyName));
+            ticketInfo.setOutputMessage(respondService.produceRespond(ticketInfo.getIntents(), originalCompanyName));
 
             placeTicketsIntoCategory(ticketInfo, feedbackOutput);
         });
@@ -70,6 +71,7 @@ public class IntouchServiceImpl implements IntouchService {
     @Override
     public FeedbackOutput getSikayetvarFeedbacks(String companyName) {
         FeedbackOutput feedbackOutput = new FeedbackOutput();
+        String originalCompanyName = companyName;
         List<SikayetVarInfo> reviewList = sikayetVarService.getReviews(companyName);
         reviewList.stream().forEach(review -> {
             TicketInfo ticketInfo = new TicketInfo();
@@ -78,7 +80,7 @@ public class IntouchServiceImpl implements IntouchService {
             ticketInfo.setSummaryText(summaryService.getSummary(review.getMessage()));
             List<String> intentsWithLabel = classify(review.getMessage());
             ticketInfo.setIntents(getCategoryList(intentsWithLabel));
-            ticketInfo.setOutputMessage(respondService.produceRespond(ticketInfo.getIntents(), companyName));
+            ticketInfo.setOutputMessage(respondService.produceRespond(ticketInfo.getIntents(), originalCompanyName));
 
             placeTicketsIntoCategory(ticketInfo, feedbackOutput);
         });

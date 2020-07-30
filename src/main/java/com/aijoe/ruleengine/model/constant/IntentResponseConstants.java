@@ -1,7 +1,7 @@
 package com.aijoe.ruleengine.model.constant;
 
 public class IntentResponseConstants {
-    public static final String RESPOND_HEADER = "Değerli müşterimiz,\n" + "Bildiriminiz için teşekkür ederiz.\n";
+    public static final String RESPOND_HEADER = "Değerli müşterimiz,\n" + "Bildiriminiz için teşekkür ederiz.\n\n";
     public static final String RESPOND_FOOTER = "\nİyi günler dileriz.  \n\n" + "Saygılarımızla,\n";
 
     public static final String RESPOND_BODY_INTRO = " ile ilgili talebinizi incelemeye aldık.";
@@ -32,7 +32,7 @@ public class IntentResponseConstants {
     public static final String ATM_SORUNLARI_SUBE_SIKAYETI_RESPOND = "ATM'lerimiz ve şubelerimiz ile ilgili Müşteri İletişim Merkezi'miz ile ilgili talebinizi incelemeye aldık. Kart ücretinin hatalı olarak alınması durumunda iadesi, yapılmaktadır. Konuyu inceleyerek size dönüş yapabilmemiz için iletişim bilgilerinizi de iletmenizi rica ederiz.";
     public static final String KAMPANYA_SORUNLARI_SUBE_SIKAYETI_RESPOND = "Kampanyalar ve şubelerimiz ile ilgili talebinizi incelemeye aldık. Kart ücretinin hatalı olarak alınması durumunda iadesi, yapılmaktadır. Konuyu inceleyerek size dönüş yapabilmemiz için iletişim bilgilerinizi de iletmenizi rica ederiz.";
 
-    public static final String NO_MATCH_RESPOND = "Şu an anlayamadım ancak kendimi geliştirmeye devam ediyorum. Konuyu inceleyerek size dönüş yapabilmemiz için iletişim bilgilerinizi de iletmenizi rica ederiz.";
+    public static final String NO_MATCH_RESPOND = "Talebinizi daha detaylı inceleyebilmemiz için iletişim formumuzu doldurmanızı rica ederiz.";
 
 
 }

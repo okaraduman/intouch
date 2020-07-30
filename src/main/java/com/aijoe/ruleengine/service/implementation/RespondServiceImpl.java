@@ -4,6 +4,7 @@ import com.aijoe.ruleengine.service.RespondService;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 
@@ -23,7 +24,7 @@ public class RespondServiceImpl implements RespondService {
         if (RESPOND_COMBINATION_MAP.containsKey(combinationKey)) {
             respondBuilder.append(RESPOND_COMBINATION_MAP.get(combinationKey));
         } else {
-            String intentCombinationText = String.join(" ve ", intentList);
+            String intentCombinationText = getOutputIntentCombinationText(intentList);
             respondBuilder.append(intentCombinationText).append(RESPOND_BODY_INTRO).append(RESPOND_BODY_END);
         }
 
@@ -42,5 +43,41 @@ public class RespondServiceImpl implements RespondService {
         return NO_MATCH;
     }
 
+    private String getOutputIntentCombinationText(List<String> intentList) {
+        List<String> keywords = Arrays.asList("Şikayetleri", "Sorunları");
+        StringBuilder sb = new StringBuilder();
+        keywords.stream().forEach(keyword -> {
+            String replaceWord = " " + keyword;
+            if (intentList.size() == 3) {
+                if (intentList.get(0).contains(keyword) && (intentList.get(1).contains(keyword) || intentList.get(2).contains(keyword))) {
+                    sb.append(intentList.get(0).replaceAll(replaceWord, ""));
+                    if (intentList.get(1).contains(keyword) && intentList.get(2).contains(keyword)) {
+                        sb.append(", ").append(intentList.get(1).replaceAll(replaceWord, ""));
+                        sb.append(" ve ").append(intentList.get(2));
+                    } else if (intentList.get(2).contains(keyword)) {
+                        sb.append(" ve ").append(intentList.get(2));
+                        sb.append(", ").append(intentList.get(1));
+                    } else {
+                        sb.append(" ve ").append(intentList.get(1));
+                        sb.append(", ").append(intentList.get(2));
+                    }
+                } else {
+                    if (!sb.toString().contains(intentList.get(0)))
+                        sb.append(intentList.get(0)).append(" ve ").append(intentList.get(1)).append(" ve ").append(intentList.get(2));
+                }
+            } else if (intentList.size() == 2) {
+                if (intentList.get(0).contains(keyword) && intentList.get(1).contains(keyword)) {
+                    sb.append(intentList.get(0).replaceAll(replaceWord, ""));
+                    sb.append(" ve ").append(intentList.get(1));
+                } else {
+                    if (!sb.toString().contains(intentList.get(0)))
+                        sb.append(intentList.get(0)).append(" ve ").append(intentList.get(1));
+                }
+            }
+
+        });
+
+        return sb.toString();
+    }
 
 }

@@ -12,7 +12,6 @@ public class TicketInfo implements Serializable {
     private String originalMessageUrl;
     private String summaryText;
     private List<String> intents;
-    private Boolean isIntentCountEqual;
     private String outputMessage;
 
     public TicketInfo() {
