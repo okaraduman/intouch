@@ -38,7 +38,8 @@ API olarak kullanabilir ya da dilerseniz bu proje için oluşturduğumuz açık 
 
 | HTTP METHOD | URL | BODY |
 |     :---:      |     :---:      |     :---:      |
-| GET   | /intouch/twitter/garanti bbva     | N/A    |
+| GET   | /intouch/sikayetvar/{companyName}  --> (i.e /intouch/sikayetvar/garanti bbva)   | N/A    |
+| GET   | /intouch/twitter/{companyName}  --> (i.e /intouch/twitter/garanti bbva)   | N/A    |
 
 ```json
 {
