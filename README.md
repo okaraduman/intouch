@@ -64,4 +64,3 @@ API olarak kullanabilir ya da dilerseniz bu proje için oluşturduğumuz açık 
 * [Zemberek-NLP](https://github.com/ahmetaa/zemberek-nlp)
 * [Teaddict/Turkce Metin Ozetleme](https://github.com/teaddict/turkce-metin-ozetleme-scala)
 
-#Acıkhack2
