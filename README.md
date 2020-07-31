@@ -17,7 +17,7 @@ birbirlerine bir adım daha yaklaştırır. >>*
 * **Osman Burak Kazkılınç**, [@burakkazkilinc](https://github.com/burakkazkilinc)
 * **Oğuzhan Karaduman**, [@okaraduman](https://github.com/okaraduman)
 
-> Projeyi geliştirmeye başlamadan önce oluşturduğumuz bileşenleri, uyguladığımız metodolojiyi, görev dağımlarını görmek ve oluşturduğumuz mimariye, uygulamanın arayüzünün mock çizimlerine ulaşmak için [buraya tıklayınız.](https://trello.com/b/uHX7tQjW/intouch)
+> Projeyi geliştirmeye başlamadan önce oluşturduğumuz bileşenleri, uyguladığımız metodolojiyi, görev dağımlarını, teknik mimariyi, uygulama arayüzünün mock çizimlerini görmek için [buraya tıklayınız.](https://trello.com/b/uHX7tQjW/intouch)
 
 
 ### KURULUM
