@@ -1,5 +1,5 @@
 # INTOUCH
-Dijital dünyada ben de varım diyen, müşterilerinin fikir, öneri ve şikayetlerini önemseyen her bir kuruluş için; müşteri sadakati ve verimlilik üzerinde olumlu etkiler metin sınıflandırma çözümleri sunuyoruz.
+Dijital dünyada ben de varım diyen, müşterilerinin fikir, öneri ve şikayetlerini önemseyen her bir kuruluş için; müşteri sadakati ve verimlilik üzerinde olumlu etkiler yaratacak metin sınıflandırma çözümleri sunuyoruz.
 
 >  *<< İnsanlar, bot’lara da hikayelerini anlatmak ister. Bot’un
 anlamakta zorlandığı kompleks, uzun ve birden fazla
