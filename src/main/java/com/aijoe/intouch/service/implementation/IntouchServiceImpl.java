@@ -40,8 +40,8 @@ public class IntouchServiceImpl implements IntouchService {
     @Autowired
     public IntouchServiceImpl(TwitterService twitterService, SikayetVarService sikayetVarService, ClarifyService clarifyService, SummaryService summaryService, RespondService respondService, IntouchProperties intouchProperties) {
         this.twitterService = twitterService;
-        this.clarifyService = clarifyService;
         this.sikayetVarService = sikayetVarService;
+        this.clarifyService = clarifyService;
         this.summaryService = summaryService;
         this.respondService = respondService;
         this.intouchProperties = intouchProperties;
@@ -56,8 +56,7 @@ public class IntouchServiceImpl implements IntouchService {
             TicketInfo ticketInfo = new TicketInfo();
             ticketInfo.setOriginalMessage(tweet.getMessage());
             ticketInfo.setOriginalMessageUrl(tweet.getUrl());
-            String cleanText = clarifyService.clarifySentence(Arrays.asList(tweet.getMessage())).stream().filter(Objects::nonNull).findFirst().get();
-            ticketInfo.setSummaryText(cleanText);
+            ticketInfo.setSummaryText(clarifyService.clarifySentences(tweet.getMessage()));
             List<String> intentsWithLabel = classify(ticketInfo.getSummaryText(), true);
             ticketInfo.setIntents(getCategoryList(intentsWithLabel));
             ticketInfo.setOutputMessage(respondService.produceRespond(ticketInfo.getIntents(), originalCompanyName));
@@ -78,9 +77,10 @@ public class IntouchServiceImpl implements IntouchService {
             ticketInfo.setOriginalMessage(review.getMessage());
             ticketInfo.setOriginalMessageUrl(review.getUrl());
             ticketInfo.setSummaryText(summaryService.getSummary(review.getMessage()));
-            List<String> intentsWithLabel = classify(ticketInfo.getSummaryText(), true);
+            List<String> intentsWithLabel = classify(review.getMessage(), false);
             if (CollectionUtils.isEmpty(intentsWithLabel)) {
-                intentsWithLabel = classify(review.getMessage(), false);
+                intentsWithLabel = classify(ticketInfo.getSummaryText(), true);
+
             }
             ticketInfo.setIntents(getCategoryList(intentsWithLabel));
             ticketInfo.setOutputMessage(respondService.produceRespond(ticketInfo.getIntents(), originalCompanyName));
