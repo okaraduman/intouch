@@ -58,7 +58,7 @@ public class IntouchServiceImpl implements IntouchService {
             ticketInfo.setOriginalMessageUrl(tweet.getUrl());
             String cleanText = clarifyService.clarifySentence(Arrays.asList(tweet.getMessage())).stream().filter(Objects::nonNull).findFirst().get();
             ticketInfo.setSummaryText(cleanText);
-            List<String> intentsWithLabel = classify(tweet.getMessage());
+            List<String> intentsWithLabel = classify(ticketInfo.getSummaryText(), true);
             ticketInfo.setIntents(getCategoryList(intentsWithLabel));
             ticketInfo.setOutputMessage(respondService.produceRespond(ticketInfo.getIntents(), originalCompanyName));
 
@@ -78,7 +78,10 @@ public class IntouchServiceImpl implements IntouchService {
             ticketInfo.setOriginalMessage(review.getMessage());
             ticketInfo.setOriginalMessageUrl(review.getUrl());
             ticketInfo.setSummaryText(summaryService.getSummary(review.getMessage()));
-            List<String> intentsWithLabel = classify(review.getMessage());
+            List<String> intentsWithLabel = classify(ticketInfo.getSummaryText(), true);
+            if (CollectionUtils.isEmpty(intentsWithLabel)) {
+                intentsWithLabel = classify(review.getMessage(), false);
+            }
             ticketInfo.setIntents(getCategoryList(intentsWithLabel));
             ticketInfo.setOutputMessage(respondService.produceRespond(ticketInfo.getIntents(), originalCompanyName));
 
@@ -88,29 +91,39 @@ public class IntouchServiceImpl implements IntouchService {
         return feedbackOutput;
     }
 
-    private List<String> classify(String messages) {
+    private List<String> classify(String messageText, boolean isSummary) {
         try {
+            Set<String> intentList = new HashSet<>();
             Path path = Paths.get("src/main/resources/datasets/corpus.model");
             FastTextClassifier classifier = FastTextClassifier.load(path);
-            String[] splittedMessage = messages.split("[.!?:]");
-            Set<String> intentList = new HashSet<>();
 
-            Arrays.asList(splittedMessage).stream().forEach(message -> {
-                String processed = String.join(" ", TurkishTokenizer.DEFAULT.tokenizeToStrings(message));
-                processed = processed.toLowerCase(Turkish.LOCALE);
-                List<ScoredItem<String>> classifierResults = classifier.predict(processed, 3);
-                if (!CollectionUtils.isEmpty(classifierResults)) {
-                    intentList.addAll(classifierResults.stream().filter(Objects::nonNull).filter(t -> t.score > intouchProperties.getTreshold()).map(t -> t.item).collect(Collectors.toSet()));
-                }
-            });
-
+            if (isSummary) {
+                addIntoIntentList(intentList, classifier, messageText);
+            } else {
+                String[] splittedMessage = messageText.split("[.!?:]");
+                Arrays.asList(splittedMessage).stream().forEach(message -> {
+                    addIntoIntentList(intentList, classifier, message);
+                });
+            }
             return intentList.stream().collect(Collectors.toList());
-
         } catch (IOException e) {
             e.printStackTrace();
             return new ArrayList<String>() {{
                 add(NO_MATCH);
             }};
+        } catch (Exception e) {
+            return new ArrayList<String>() {{
+                add(NO_MATCH);
+            }};
+        }
+    }
+
+    private void addIntoIntentList(Set<String> intentList, FastTextClassifier classifier, String message) {
+        String processed = String.join(" ", TurkishTokenizer.DEFAULT.tokenizeToStrings(message));
+        processed = processed.toLowerCase(Turkish.LOCALE);
+        List<ScoredItem<String>> classifierResults = classifier.predict(processed, 3);
+        if (!CollectionUtils.isEmpty(classifierResults)) {
+            intentList.addAll(classifierResults.stream().filter(Objects::nonNull).filter(t -> t.score > intouchProperties.getTreshold()).map(t -> t.item).collect(Collectors.toSet()));
         }
     }
 

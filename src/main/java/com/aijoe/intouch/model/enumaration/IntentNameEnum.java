@@ -9,15 +9,11 @@ public class IntentNameEnum {
     public static final String LABEL_KOMISYON_UCRETLERI_SIKAYETI = "__label__KomisyonUcretleriSikayeti";
     public static final String LABEL_DIJITAL_KANAL_SIKAYETLERI = "__label__DijitalKanalSikayetleri";
     public static final String LABEL_KART_SORUNLARI = "__label__KartSorunlari";
-    public static final String LABEL_HUKUKI_ISLEMLER = "__label__HukukiIslemler";
-    public static final String LABEL_BORC_YAPILANDIRMA_SORUNLARI = "__label__BorcYapilandirmaSorunlari";
-    public static final String LABEL_ISLEM_ITIRAZI = "__label__IslemItirazi";
-    public static final String LABEL_KART_TESLIMAT_SORUNLARI = "__label__KartTeslimatSorunlari";
     public static final String LABEL_HGS_OGS_SORUNLARI = "__label__HGS/OGSSorunlari";
-    public static final String LABEL_ISLEM_IADESI = "__label__IslemIadesi";
     public static final String LABEL_URUN_BASVURU_REDDI = "__label__UrunBasvuruReddi";
     public static final String LABEL_URUN_IPTAL_SORUNLARI = "__label__UrunIptalSorunlari";
     public static final String LABEL_ILETISIM_TERCIHI_DEGISIKLIGI = "__label__IletisimTercihiDegisikligi";
     public static final String LABEL_PARA_TRANSFERI_SORUNLARI = "__label__ParaTransferiSorunlari";
+    public static final String LABEL_ODEME_SORUNLARI = "__label__OdemeSorunlari";
 
 }
