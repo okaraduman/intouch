@@ -48,35 +48,34 @@ public class RespondServiceImpl implements RespondService {
         StringBuilder sb = new StringBuilder();
         keywords.stream().forEach(keyword -> {
             String replaceWord = " " + keyword;
-            if (intentList.size() == 3) {
-                if (intentList.get(0).contains(keyword) && (intentList.get(1).contains(keyword) || intentList.get(2).contains(keyword))) {
-                    sb.append(intentList.get(0).replaceAll(replaceWord, ""));
-                    if (intentList.get(1).contains(keyword) && intentList.get(2).contains(keyword)) {
-                        sb.append(", ").append(intentList.get(1).replaceAll(replaceWord, ""));
-                        sb.append(" ve ").append(intentList.get(2));
-                    } else if (intentList.get(2).contains(keyword)) {
-                        sb.append(" ve ").append(intentList.get(2));
-                        sb.append(", ").append(intentList.get(1));
-                    } else {
-                        sb.append(" ve ").append(intentList.get(1));
-                        sb.append(", ").append(intentList.get(2));
-                    }
-                } else {
-                    if (!sb.toString().contains(intentList.get(0)))
-                        sb.append(intentList.get(0)).append(" ve ").append(intentList.get(1)).append(" ve ").append(intentList.get(2));
-                }
-            } else if (intentList.size() == 2) {
+            if (intentList.size() == 2) {
                 if (intentList.get(0).contains(keyword) && intentList.get(1).contains(keyword)) {
                     sb.append(intentList.get(0).replaceAll(replaceWord, ""));
                     sb.append(" ve ").append(intentList.get(1));
                 } else {
-                    if (!sb.toString().contains(intentList.get(0)))
+                    if (!sb.toString().contains(intentList.get(1)) && (intentList.get(0).contains(keyword) || intentList.get(1).contains(keyword)))
                         sb.append(intentList.get(0)).append(" ve ").append(intentList.get(1));
                 }
+            } else if (intentList.size() == 3) {
+                if (intentList.get(0).contains(keyword)) {
+                    String newTextForFirst = intentList.get(0).replace(replaceWord, "");
+                    if (intentList.get(1).contains(keyword) && intentList.get(2).contains(keyword)) {
+                        sb.append(newTextForFirst).append(", ").append(intentList.get(1).replaceAll(replaceWord, "")).append(" ve ").append(intentList.get(2));
+                    } else if (intentList.get(1).contains(keyword)) {
+                        sb.append(newTextForFirst).append(", ").append(intentList.get(1)).append(" ve ").append(intentList.get(2));
+                    } else if (intentList.get(2).contains(keyword)) {
+                        sb.append(newTextForFirst).append(", ").append(intentList.get(2)).append(" ve ").append(intentList.get(1));
+                    } else {
+                        if (!sb.toString().contains(intentList.get(1)) && (intentList.get(0).contains(keyword) || intentList.get(1).contains(keyword) || intentList.get(2).contains(keyword)))
+                            sb.append(intentList.get(0)).append(", ").append(intentList.get(1)).append(" ve ").append(intentList.get(2));
+                    }
+                }
             }
-
         });
 
+        if (sb.toString().length() < 1) {
+            sb.append(String.join(", ", intentList));
+        }
         return sb.toString();
     }
 
