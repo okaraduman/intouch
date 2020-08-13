@@ -1,6 +1,8 @@
 # INTOUCH
 Dijital dünyada ben de varım diyen, müşterilerinin fikir, öneri ve şikayetlerini önemseyen her bir kuruluş için müşteri sadakati ve verimlilik üzerinde olumlu etkiler yaratacak metin sınıflandırma çözümleri sunuyoruz.
 
+> Teknofest 2020 Türkçe Doğal Dil İşleme Yarışması kapsamında oluşturduğumuz sunuma [proje dosyaları içerisinden](okaraduman/intouch/blob/master/INTOUCH_Kapanış Sunumu.pdf) veya Google Drive üzerinden [ulaşabilir](https://drive.google.com/drive/folders/1X8ED-3wyIGODAhFokCxZ17exP1lyrhGy?usp=sharing); demoyu [buraya tıklayarak](https://www.youtube.com/watch?v=8igPbPWZMF4&feature=youtu.be) izleyebilirsiniz.
+
 >  *<< İnsanlar, bot’lara da hikayelerini anlatmak ister. Bot’un
 anlamakta zorlandığı kompleks, uzun ve birden fazla
 amaç içeren mesajlarını anlamak insanlarla bot’ları
@@ -18,7 +20,6 @@ birbirlerine bir adım daha yaklaştırır. >>*
 * **Oğuzhan Karaduman**, [@okaraduman](https://github.com/okaraduman)
 
 > Projeyi geliştirmeye başlamadan önce oluşturduğumuz bileşenleri, uyguladığımız metodolojiyi, görev dağımlarını, teknik mimariyi, uygulama arayüzünün mock çizimlerini görmek için [buraya tıklayınız.](https://trello.com/b/uHX7tQjW/intouch)
-
 
 ### KURULUM
 Uygulamayı kullanmanız için indirdikten sonra aşağıdaki talimatları izlemeniz gerekmektedir:
