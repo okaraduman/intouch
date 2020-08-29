@@ -36,6 +36,7 @@ public class IntouchServiceImpl implements IntouchService {
     private SummaryService summaryService;
     private RespondService respondService;
     private IntouchProperties intouchProperties;
+    private FastTextClassifier classifier;
 
     @Autowired
     public IntouchServiceImpl(TwitterService twitterService, SikayetVarService sikayetVarService, ClarifyService clarifyService, SummaryService summaryService, RespondService respondService, IntouchProperties intouchProperties) {
@@ -45,6 +46,11 @@ public class IntouchServiceImpl implements IntouchService {
         this.summaryService = summaryService;
         this.respondService = respondService;
         this.intouchProperties = intouchProperties;
+        try {
+            classifier = getFastTextClassifier();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -94,9 +100,6 @@ public class IntouchServiceImpl implements IntouchService {
     private List<String> classify(String messageText, boolean isSummary) {
         try {
             Set<String> intentList = new HashSet<>();
-            Path path = Paths.get("src/main/resources/datasets/corpus.model");
-            FastTextClassifier classifier = FastTextClassifier.load(path);
-
             if (isSummary) {
                 addIntoIntentList(intentList, classifier, messageText);
             } else {
@@ -106,16 +109,16 @@ public class IntouchServiceImpl implements IntouchService {
                 });
             }
             return intentList.stream().collect(Collectors.toList());
-        } catch (IOException e) {
-            e.printStackTrace();
-            return new ArrayList<String>() {{
-                add(NO_MATCH);
-            }};
         } catch (Exception e) {
             return new ArrayList<String>() {{
                 add(NO_MATCH);
             }};
         }
+    }
+
+    private FastTextClassifier getFastTextClassifier() throws IOException {
+        Path path = Paths.get("src/main/resources/datasets/corpus.model");
+        return FastTextClassifier.load(path);
     }
 
     private void addIntoIntentList(Set<String> intentList, FastTextClassifier classifier, String message) {
@@ -144,9 +147,13 @@ public class IntouchServiceImpl implements IntouchService {
                 }
             });
         } else {
-            feedbackOutput.getCategoryList().put(NO_MATCH, new ArrayList<TicketInfo>() {{
-                add(ticketInfo);
-            }});
+            if (feedbackOutput.getCategoryList().get(NO_MATCH) != null) {
+                feedbackOutput.getCategoryList().get(NO_MATCH).add(ticketInfo);
+            } else{
+                feedbackOutput.getCategoryList().put(NO_MATCH, new ArrayList<TicketInfo>() {{
+                    add(ticketInfo);
+                }});
+            }
         }
     }
 
